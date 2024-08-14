@@ -1,0 +1,46 @@
+.rnn : reiquire not null
+    ANY  →  val $END$ = requireNotNull($expr$) { "$varName#2$不能为空!" }
+
+.cnn : check not null
+    ANY  →  val $END$ = checkNotNull($expr$) { "$varName#2$不能为空!" }
+
+.tne : take if not empty
+    ANY ->  $expr$?.takeIf { it.isNotEmpty() }$END$
+
+.sout : 使用打印值调用的描述创建 System.out.println
+    ANY -> println( "$expr$ = \${$expr$}" )
+
+.hjts : use hutool json format string
+    ANY -> JSONUtil.toJsonStr($expr$)
+.while : iterator while loop
+    ANY -> while($expr$.hasNext()){ \
+               $expr$.next().$END$ \
+           }
+.mfor : foreach of a map object
+    ANY -> $expr$.forEach{($key:"key"$,$value:"value"$)->\
+              $END$\
+           }
+
+.meav : measure time and value with nanotime
+    ANY -> measureTimedValue{\
+        $expr$\
+    }$END$
+
+.mean : measure time with nanotime
+    ANY -> measureNanoTime{\
+        $expr$\
+    }$END$
+
+.meam : measure time with millisecond
+    ANY -> measureTimeMillis{\
+        $expr$\
+    }$END$
+
+.crs : controller return success
+    ANY [com.ahmux.ms.common.utils.ResultGenerator] -> com.ahmux.ms.common.utils.ResultGenerator.genSuccessResult($expr$)
+    ANY [com.bcht.component.common.core.dto.SingleResponse] -> com.bcht.component.common.core.dto.SingleResponse($expr$)
+
+.cre : controller return error
+    ANY -> ResultGenerator.genFailResult<$type:kotlinVariable():"Boolean")$>().apply {\
+                this.data = $expr$\
+            }$END$
